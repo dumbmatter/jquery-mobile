@@ -235,7 +235,7 @@ $.widget( "mobile.slider", $.mobile.widget, {
 					data.pageX > this.slider.offset().left + this.slider.width() + tol ) {
 				return;
 			}
-			percent = Math.round( ( ( data.pageX - this.slider.offset().left ) / this.slider.width() ) * 100 );
+			percent = ( ( data.pageX - this.slider.offset().left ) / this.slider.width() ) * 100;
 		} else {
 			if ( val == null ) {
 				val = cType === "input" ? parseFloat( control.val() ) : control[0].selectedIndex;
@@ -255,7 +255,18 @@ $.widget( "mobile.slider", $.mobile.widget, {
 			percent = 100;
 		}
 
-		var newval = Math.round( ( percent / 100 ) * ( max - min ) ) + min;
+		// Calculate how many decimal places to allow
+		step = window.parseFloat( control.attr( "step" ) || 1 )
+		stepAfterDecimal = String(step).split( "." )[1]
+		if( typeof(stepAfterDecimal) !== "undefined" ) {
+			stepDecimalPlaces = stepAfterDecimal.length;
+		}
+		else {
+			stepDecimalPlaces = 0;
+		}
+		stepFactor = Math.pow(10, stepDecimalPlaces);
+
+		var newval = Math.round( stepFactor * ( percent / 100 ) * ( max - min ) ) / stepFactor + min;
 
 		if ( newval < min ) {
 			newval = min;
